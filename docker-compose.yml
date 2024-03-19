@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  storagenode:
+    image: storjlabs/storagenode:latest
+    restart: always
+    stop_grace_period: 5m
+    volumes:
+      - /home/pi/identity/:/app/identity
+      - /mnt/storj/data:/app/config
+    ports:
+      - 28967:28967
+      - 192.168.10.121:14002:14002
+      - 0.0.0.0:5999:5999
+    logging:
+      max-size: "50m"
+      max-file: "10"
+    environment:
+      WALLET: "0x15E7aF2D3996C4CF31CE94fa95c4424e5958c0eC"
+      EMAIL: "abc@gmail.com"
+      ADDRESS: "78.133.171.98:28967"
+      STORAGE: "2TB"
+
+  pyroscope:
+    image: 'grafana/phlare:latest'
+    ports:
+      - 4100:4100
+    command: -config.file=/etc/pyroscope/config.yaml
+    volumes:
+      - ./pyroscope/config.yaml:/etc/pyroscope/config.yaml
+
+  agent:
+    image: grafana/agent:latest
+    volumes:
+      - ./agent/config:/etc/agent-config
+    command:
+      - run
+      - /etc/agent-config/config.river
+    environment:
+      HOSTNAME: agent
+      AGENT_MODE: flow
+    ports:
+      - "12345:12345"

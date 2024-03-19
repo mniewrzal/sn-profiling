@@ -1,0 +1,20 @@
+pyroscope.write "cloud" {
+  endpoint {
+    url = ""
+
+    basic_auth {
+      username = ""
+      password = ""
+    }
+  }
+}
+
+
+pyroscope.scrape "default" {
+  targets = [
+    {"__address__" = "node:5999", "app"="storagenode-michal"},
+  ]
+  scrape_interval = "120s"
+  scrape_timeout = "200s"
+  forward_to = [pyroscope.write.cloud.receiver]
+}
